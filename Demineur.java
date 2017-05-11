@@ -3,6 +3,7 @@
 public class Demineur{
 	int[][] tab;
 	int taille = 12;
+	boolean[][] tab2;
 	
 	public Demineur(){
 		tab = new int[taille][taille];
@@ -21,6 +22,25 @@ public class Demineur{
 			System.out.println();
 		}
 	}
+	
+	public void decouvreMine(int x, int y){
+		if (tab2[x][y] == true){
+		}
+		else if (tab2[x][y] == false && tab[x][y] != 0 && tab[x][y] != 9){
+			tab2[x][y] == true;
+		}
+		else if (tab2[x][y] == false && tab[x][y] == 9){
+			tab2[x][y] == true;
+			//game over
+		}
+		else if(tab2[x][y] == false && tab[x][y] == 0){
+			
+			//open the adjacents
+		}
+		
+		
+	}
+	
 	
 	public void genereMines (){
 		double ratio = 1/6.0;
