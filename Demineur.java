@@ -5,8 +5,9 @@ public class Demineur{
 	int taille = 12;
 	boolean[][] tab2;
 	boolean[][] drap;
+	boolean[][] calc;
 	
-	public Demineur(){ //Constructeur avec le tableau de nombres, le tableau de cases ouvertes et le tableau de drapeaux
+	public Demineur(){ //Constructeur avec le tableau de nombres, le tableau de cases ouvertes, le tableau de drapeaux et le tableau des calculs aléatoires
 		tab = new int[taille][taille];
 		for (int i=0; i<taille; i++) {
 			for (int j=0; j<taille; j++) {
@@ -25,13 +26,30 @@ public class Demineur{
 				drap[i][j] = false;
 			}
 		}
+		calc = new boolean[taille][taille];
+		for (int i=0; i<taille; i++) {
+			for (int j=0; j<taille; j++) {
+				drap[i][j] = false;
+			}
+		}
 	}
 	
-	public void afficherChamps(){ //Méthode inutilisée en pratique, mais permet de voir les nombres (mines et mines autour
+	public void welcome(){
+		System.out.println("Bonjour et bienvenue dans notre démineur. \n\nIci toutes les règles du démineur sont respectées. \n\nVous devez découvrir toutes les cases du tableau (sauf les mines) en un minimum de temps !\n\nMais pour ajouter un peu de fun, certaines cases sont spéciales : \nsi vous arrivez à répondre à une question de calcul mental ou à une énigme vous gagnerez 60 secondes .. si vous tombez sur un monstre vous en perdrez 120 !");
+		System.out.println();
+		System.out.println("Amusez vous bien");
+		System.out.println();
+		System.out.println();
+		System.out.println("Auteurs du code java : Victor Dubrovolschi et Villenave Sophie \nDans le cadre du projet d'informatique de fin de 1ere année");
+		System.out.println();
+		System.out.println();
+	}
+	
+	public void afficherChamps(){ //Méthode inutilisée en pratique, mais permet de voir les tableaux
 		
 		for (int i=0; i<taille; i++) {
 			for (int j=0; j<taille; j++) {
-				System.out.print(tab[i][j] + " ");
+				System.out.print(calc[i][j] + " ");
 			}
 			System.out.println();
 		}
@@ -87,11 +105,28 @@ public class Demineur{
 		}
 	}
 	
+	public boolean affCalc(int i, int j){
+		Scanner sc = new Scanner(System.in);
+		boolean value = false;
+		if(calc[i][j]==true){
+			int a = (int)(1+(Math.random()*(14)));
+			int b = (int)(1+(Math.random()*(14)));
+			int c = (int)(Math.random()*(50));
+			int calculus = (a * b) + c;
+			System.out.println(a+"*"+b+"+"+c+" = ?");
+			int rep = sc.nextInt();
+			if(calculus == rep){
+				value = true;
+			} 
+		}
+		return value;
+	}
+	
 	public void demandeDrap(){ //Méthode demandant la pose d'un drapeau
 		
 		Scanner sc = new Scanner(System.in);
 		Scanner sc2 = new Scanner(System.in);
-		System.out.println("Voulez-vous poser un drapeau ? ( y / n )");
+		System.out.println("Voulez-vous poser ou enlever un drapeau ? ( y / n )");
 		String answer = sc2.nextLine();
 		if(answer.equals("y")){
 				
@@ -113,7 +148,11 @@ public class Demineur{
 				b = sc.nextInt()-1;
 			}
 				
-			drap[a][b]=true;
+			if(drap[a][b]==true){
+				drap[a][b]=false;
+			}else if(drap[a][b]==false){
+				drap[a][b]=true;
+			}
 			afficherChampsBoolean();
 			demandeDrap();
 		}
@@ -121,18 +160,18 @@ public class Demineur{
 		
 	public void decouvreMine(int i, int j){ //Méthode permettant de découvrir les mines
 		
-		if (tab2[i][j] == false && tab[i][j] != 0 && tab[i][j] != 9){
+		if (tab2[i][j] == false && tab[i][j] != 0 && tab[i][j] != 9 && drap[i][j] == false){
 			tab2[i][j] = true;
 			
-		}else if (tab[i][j] == 9){
+		}else if (tab[i][j] == 9 && drap[i][j] == false){
 			tab2[i][j] = true;
 			
-		}else if(tab2[i][j] == false && tab[i][j] == 0){
+		}else if(tab2[i][j] == false && tab[i][j] == 0 && drap[i][j] == false){
 			
 			//open the adjacents
 			
 			
-				if (i == 0 && j== 0 && tab[i][j] != 9) { //left up
+				if (i == 0 && j== 0 && tab[i][j] != 9 && drap[i][j] == false) { //left up
 					tab2[i][j] = true;
 					for (int k=0; k<2; k++) {
 						for (int l=0; l<2; l++) {
@@ -140,7 +179,7 @@ public class Demineur{
 						}
 					}
 				}
-				if (i == taille-1 && j== 0 && tab[i][j] != 9) { // down left
+				if (i == taille-1 && j== 0 && tab[i][j] != 9 && drap[i][j] == false) { // down left
 					tab2[i][j] = true;
 					for (int k=i-1; k<=i; k++) {
 						for (int l=0; l<2; l++) {
@@ -148,7 +187,7 @@ public class Demineur{
 						}
 					}
 				}
-				if (i == 0 && j== taille-1 && tab[i][j] != 9) { // up right
+				if (i == 0 && j== taille-1 && tab[i][j] != 9 && drap[i][j] == false) { // up right
 					tab2[i][j] = true;
 					for (int k=0; k<=1; k++) {
 						for (int l=j-1; l<=j; l++) {
@@ -156,7 +195,7 @@ public class Demineur{
 						}
 					}
 				}				
-				if (i == taille-1 && j== taille-1 && tab[i][j] != 9) { // down right
+				if (i == taille-1 && j== taille-1 && tab[i][j] != 9 && drap[i][j] == false) { // down right
 					tab2[i][j] = true;
 					for (int k=i-1; k<=i; k++) {
 						for (int l=j-1; l<=j; l++) {
@@ -164,7 +203,7 @@ public class Demineur{
 						}
 					}
 				}
-				if (i == 0 && j!=0 && j!= taille-1 && tab[i][j] != 9) { // 1 line
+				if (i == 0 && j!=0 && j!= taille-1 && tab[i][j] != 9 && drap[i][j] == false) { // 1 line
 					tab2[i][j] = true;
 					for (int k=0; k<=1; k++) {
 						for (int l=j-1; l<=j+1; l++) {
@@ -172,7 +211,7 @@ public class Demineur{
 						}
 					}
 				}
-				if (i == taille -1 && j!=0 && j!= taille-1 && tab[i][j] != 9) { // last line
+				if (i == taille -1 && j!=0 && j!= taille-1 && tab[i][j] != 9 && drap[i][j] == false) { // last line
 					tab2[i][j] = true;
 					for (int k=i-1; k<=i; k++) {
 						for (int l=j-1; l<=j+1; l++) {
@@ -180,7 +219,7 @@ public class Demineur{
 						}
 					}
 				}
-				if (i != 0 && j==0 && i!= taille-1 && tab[i][j] != 9) { // 1 row
+				if (i != 0 && j==0 && i!= taille-1 && tab[i][j] != 9 && drap[i][j] == false) { // 1 row
 					tab2[i][j] = true;
 					for (int k=i-1; k<=i+1; k++) {
 						for (int l=j; l<=j+1; l++) {
@@ -188,7 +227,7 @@ public class Demineur{
 						}
 					}
 				}
-				if (i != 0 && j==taille-1 && i!= taille-1 && tab[i][j] != 9) { // last row
+				if (i != 0 && j==taille-1 && i!= taille-1 && tab[i][j] != 9 && drap[i][j] == false) { // last row
 					tab2[i][j] = true;
 					for (int k=i-1; k<=i+1; k++) {
 						for (int l=j-1; l<=j; l++) {
@@ -197,7 +236,7 @@ public class Demineur{
 						}
 					
 				}
-				else if(i!=0 && i!= taille-1 && j!=0 && j!= taille-1 && tab[i][j] != 9){
+				else if(i!=0 && i!= taille-1 && j!=0 && j!= taille-1 && tab[i][j] != 9 && drap[i][j] == false){
 					tab2[i][j] = true;
 					for (int k=i-1; k<=i+1; k++) {
 						for (int l=j-1; l<=j+1; l++) {
@@ -207,6 +246,16 @@ public class Demineur{
 				}	
 		}
 	}	
+	
+	public void genereCalc(){
+		for (int i=0; i<taille; i++) {
+			for (int j=0; j<taille; j++) {
+				if (Math.random() <= 0.3 && tab[i][j]!=9) {
+					calc[i][j]=true;
+				}
+			}
+		}
+	}
 	
 	public void genereMines (int k, int l){ //Méthode permettant de générer les mines
 		
@@ -414,7 +463,9 @@ public class Demineur{
 	}
 	
 	public void startGame(){ //Méthode gérant le jeu
-
+		welcome();
+		
+		long repere = System.currentTimeMillis();
 		Scanner sc = new Scanner(System.in);
 		
 		System.out.println("Donnez la ligne (1 à "+taille+")");
@@ -435,9 +486,24 @@ public class Demineur{
 			
 		genereMines(i,j);
 		genereNombres();
+		genereCalc();
 		decouvreMine(i,j);
+		afficherChamps();
 		System.out.println();
 		afficherChampsBoolean();
+		String time="";
+		boolean calcul = affCalc(i,j);
+		
+		if(calcul==true){
+			time = (int)(System.currentTimeMillis()-repere-60000)/1000+" secondes";
+			System.out.println("Vous avez gagné une minute, mais n'espérez pas que cela change quelque chose à votre sort");
+		}else if(calcul==false && calc[i][j]==true){
+			time = (int)(System.currentTimeMillis()-repere)/1000+" secondes";
+			System.out.println("La prochaine fois, sortez votre calculatrice.. Si vous pensez que cela changera quelque chose :)");
+
+		}
+		
+		System.out.println("Temps écoulé : "+time);
 		System.out.println();
 		while (tab[i][j]!=9 && winGame()==false){
 			
@@ -459,8 +525,21 @@ public class Demineur{
 			decouvreMine(i,j);
 			System.out.println();
 			afficherChampsBoolean();
+			System.out.println();
+			calcul = affCalc(i,j);
+			if(calcul==true){
+				time = "Temps écoulé : "+(int)(System.currentTimeMillis()-repere-60000)/1000+" secondes";
+				System.out.println("Vous avez gagné une minute, mais n'espérez pas que cela change quelque chose à votre sort");
+			}else if(calcul==false && calc[i][j]==true){
+				time = "Temps écoulé : "+(int)(System.currentTimeMillis()-repere)/1000+" secondes";
+				System.out.println("La prochaine fois, sortez votre calculatrice.. Si vous pensez que cela changera quelque chose :)");
+
+			}else{
+				time = (int)(System.currentTimeMillis()-repere)/1000+" secondes";
 			}
-			
+			System.out.println("Temps écoulé : "+time);
+
+		}
 		if(tab[i][j] == 9){
 			System.out.println("Vous avez marché sur une mine. Sans menace de mort imminente, est-ce encore de la science ?");
 		}
